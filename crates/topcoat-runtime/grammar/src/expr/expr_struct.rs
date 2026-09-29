@@ -9,11 +9,11 @@ use super::js::Js;
 use crate::expr::{Expr, name_resolver::NameResolver};
 
 impl Expr {
-    /// Lowers a struct literal of a `#[record]` type.
+    /// Generates Rust and JavaScript for a record's struct literal.
     ///
-    /// Rust builds the real struct from each field's real value, so the
-    /// compiler checks field names, types, and privacy against the record
-    /// itself.
+    /// The Rust output constructs the original struct from the fields' real
+    /// values. This lets the compiler enforce its field names, types, and
+    /// visibility rules.
     pub(super) fn expr_struct(
         expr: &ExprStruct,
         rust: &mut TokenStream,

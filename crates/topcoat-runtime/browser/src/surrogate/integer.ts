@@ -37,16 +37,16 @@ export function integerType(kind: IntegerKind, bits: number): IntegerType {
 let serverUsize: IntegerType | undefined;
 
 /**
- * Sets the server's `usize` width. Pages declare it on the runtime's script
- * tag, so only environments without that tag need to call this.
+ * Supplies the server's `usize` width when no runtime script tag is present.
+ * Pages normally provide this width through the script tag.
  */
 export function setServerUsizeBits(bits: number): void {
 	serverUsize = integerType("usize", bits);
 }
 
 /**
- * The server's `usize` type, for values the browser creates without a width
- * from the server, such as string lengths.
+ * Returns the server's `usize` type for values created in the browser,
+ * such as string lengths, that have no serialized width to read.
  */
 export function serverUsizeType(): IntegerType {
 	if (serverUsize === undefined) {

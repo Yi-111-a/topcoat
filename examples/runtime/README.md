@@ -1,15 +1,15 @@
 # Runtime
 
-Pages that use the browser runtime. Each page shows one feature:
+These pages show how to build interactive views with Topcoat's browser runtime:
 
-- `counter`: event handlers that change a signal.
-- `show`: a bind attribute that follows a signal.
-- `sort`: a page that runs again on the server when a signal it reads changes.
-- `procedure`: an event handler that calls a function on the server.
-- `shard`: search results that render again on the server when the query changes.
-- `record`: an order form that keeps a `#[record]` struct in a signal and sends it to a procedure.
+- `counter` updates a signal in response to browser events.
+- `show` binds an HTML attribute to a signal's value.
+- `sort` reads a signal on the server, causing the page to render again when that signal changes.
+- `procedure` calls a server function from a browser event handler.
+- `shard` asks the server for new search results as the query changes.
+- `record` stores an order as a `#[record]` value in a signal and submits it to a server procedure.
 
-Run it with:
+Start the example with:
 
 ```sh
 cargo topcoat dev -p runtime

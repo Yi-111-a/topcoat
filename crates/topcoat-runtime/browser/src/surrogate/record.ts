@@ -3,8 +3,8 @@ import type { DehydratedSurrogate } from "../expression/serialized";
 import { cloneValue } from "./ref";
 
 /**
- * A struct declared with `#[record]`. Fields are readable by name, so the
- * compiled field access `order.id` reads the `id` field.
+ * The browser representation of a `#[record]` struct. Named properties let
+ * generated expressions access fields directly, as in `order.id`.
  */
 export class Record {
 	[field: string]: unknown;

@@ -8,8 +8,7 @@ use syn::{
 };
 use topcoat_core_grammar::paths::topcoat_runtime;
 
-/// Field names that would collide with members of runtime values in the
-/// browser, or with protocols JavaScript looks up by name.
+/// Names reserved for browser runtime members and JavaScript protocols.
 const RESERVED_FIELDS: &[&str] = &[
     "__proto__",
     "clone",
@@ -23,7 +22,7 @@ const RESERVED_FIELDS: &[&str] = &[
     "valueOf",
 ];
 
-/// The empty attribute in `#[record]`.
+/// Arguments to `#[record]`, which accepts none.
 pub struct RecordAttr {}
 
 impl Parse for RecordAttr {
@@ -32,8 +31,7 @@ impl Parse for RecordAttr {
     }
 }
 
-/// The annotated struct. Records have named fields and no generic
-/// parameters.
+/// A struct accepted by `#[record]`, with named fields and no generics.
 pub struct RecordItem {
     pub item: ItemStruct,
 }
@@ -84,12 +82,12 @@ impl Record {
         Self(attr, item)
     }
 
-    /// Parses a record from its attribute and item token streams.
+    /// Reads a record declaration from the attribute arguments and struct tokens.
     ///
     /// # Errors
     ///
-    /// Returns an error if the attribute is not empty or the item is not a
-    /// struct with named fields and no generic parameters.
+    /// Fails if the attribute has arguments or the struct violates the record
+    /// declaration rules, including field and generic parameter restrictions.
     pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<Self> {
         Ok(Self::new(syn::parse2(attr)?, syn::parse2(item)?))
     }
@@ -199,7 +197,7 @@ impl ToTokens for Record {
                 // cloned.
 
                 impl<'__a> __TopcoatRecordRef<'__a> {
-                    /// Clones the borrowed record into an owned record.
+                    /// Returns an owned copy of the borrowed record.
                     #[must_use]
                     #[allow(clippy::should_implement_trait)]
                     pub fn clone(&self) -> __TopcoatRecord
@@ -274,7 +272,7 @@ impl ToTokens for Record {
     }
 }
 
-/// Replaces each `Self` in `tokens` with the record's name.
+/// Substitutes the record's name for `Self` throughout a token stream.
 fn replace_self(tokens: TokenStream, name: &Ident) -> TokenStream {
     tokens
         .into_iter()

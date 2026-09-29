@@ -40,8 +40,7 @@ async fn layout(slot: Slot<'_>) -> Result<impl View> {
             <head>
                 topcoat::dev::script()
 
-                // Signals, event handlers, page re-runs, procedures, and
-                // shards need the browser runtime.
+                // Load the browser runtime to enable the interactive examples.
                 topcoat::runtime::script()
             </head>
             <body>

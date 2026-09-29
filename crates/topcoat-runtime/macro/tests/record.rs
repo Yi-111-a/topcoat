@@ -1,4 +1,4 @@
-//! Records declared with `#[record]` in runtime expressions.
+//! Tests for using `#[record]` structs in runtime expressions.
 
 use serde_json::json;
 use topcoat::{
@@ -113,7 +113,7 @@ fn expressions_construct_records_and_read_fields() {
     assert_eq!(nested, 1);
 }
 
-/// A record without `Clone` still works wherever cloning is not needed.
+/// Exercises record operations that do not require `Clone`.
 #[record]
 struct Plain {
     label: String,

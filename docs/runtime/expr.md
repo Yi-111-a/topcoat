@@ -58,12 +58,12 @@ Runtime types expose a subset of their Rust APIs:
 - `f64`: arithmetic (`+`, `-`, `*`, `/`), comparisons, and negation. Floating-point literals are `f64`. Text output follows Rust's `Display`, including decimal notation and the spellings `inf`, `-inf`, and `-0`.
 - Rust integer types: arithmetic (`+`, `-`, `*`, `/`, `%`), comparisons, and negation for signed types. Unsuffixed integer literals are `usize`; use a suffix for another type, such as `42u64` or `-1i32`. Operands must have the same type. Values retain their full precision in the browser, including 128-bit integers, and pointer-sized integers use the server target's width. Arithmetic panics on overflow, division by zero, or remainder by zero in both debug and release builds. Signed `MIN / -1`, `MIN % -1`, and negating `MIN` also panic.
 - `bool`: `!`, equality comparisons, `then`, and `then_some`.
-- `String` and `&str`: `len`, `is_empty`, `trim`, `trim_start`, `trim_end`, `starts_with`, `ends_with`, `contains`, `to_owned`, and comparisons. `len` returns a `usize`.
+- `String` and `&str`: `len`, `is_empty`, `trim`, `trim_start`, `trim_end`, `starts_with`, `ends_with`, `contains`, `to_owned`, and comparisons. The result of `len` has type `usize`.
 - `Option<T>`: `is_some`, `is_none`, `unwrap`, and `expect`.
 - `Result<T, E>`: `is_ok`, `is_err`, `ok`, `err`, `unwrap`, `expect`, `unwrap_err`, and `expect_err`.
 - `Vec<T>`, `[T; N]`, and slices: `len`, `is_empty`, `get`, `index`, `first`, `last`, `to_vec`, and `to_owned`. Vectors and arrays also support `as_slice` and `clone`. Lengths and indexes are `usize`. `get` returns `None` for an out-of-bounds index; `index` panics. Both borrow the element. Elements must belong to the shared vocabulary.
 - Tuples of vocabulary types: field access such as `pair.0`, and `clone`. A field of a borrowed tuple, such as `values.index(0).0`, borrows the element. A tuple renders its elements one after another with no separator. Tuples do not support comparisons.
-- Structs declared with [`#[record]`](attr.record.html): struct literals, field access such as `order.id`, and `clone`. A field of a borrowed record borrows the field. Records do not support comparisons and do not render on their own.
+- Structs with [`#[record]`](attr.record.html): create values with struct literals and access fields by name, such as `order.id`. Access through a borrowed record borrows the field. Records that implement `Clone` also support `clone`. Expressions cannot compare records or render them directly.
 - [`Signal`]: `get` and `set`, plus a shorter spelling for common writes: `toggle` on a `bool` signal, `increment` and `decrement` on a numeric signal, and `push_str` on a `String` signal.
 
 Operations follow Rust semantics in both languages. For strings, `len` counts UTF-8 bytes, comparisons use code point order, and trimming uses Unicode `White_Space`. This means trimming keeps U+FEFF and removes U+0085.
@@ -75,7 +75,7 @@ Expressions use a subset of Rust's syntax:
 - String, integer, `f64`, and `bool` literals.
 - The unary and binary operators listed above.
 - Method calls, field access, and indexing.
-- `Some`, `None`, `Ok`, and `Err`, and struct literals of records.
+- Construction of options with `Some` and `None`, results with `Ok` and `Err`, and records with struct literals.
 - Blocks, with `let` bindings of plain identifiers; the trailing expression is the block's value.
 - `if`/`else` as an expression.
 - Closures, optionally `async`, and `.await`.

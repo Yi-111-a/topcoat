@@ -8,8 +8,8 @@ use topcoat::{
     view::{View, view},
 };
 
-// `#[record]` makes a struct usable in runtime expressions: they can build
-// it, read its fields, keep it in a signal, and send it to the server.
+// Declare an order that expressions can construct, read, store in a signal,
+// and submit to a server procedure.
 #[record]
 #[derive(Clone)]
 pub struct Order {
@@ -18,7 +18,7 @@ pub struct Order {
     address: Address,
 }
 
-// Records can contain other records.
+// Use a nested record to group the address fields within an order.
 #[record]
 #[derive(Clone)]
 pub struct Address {
@@ -45,22 +45,22 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
     });
     let receipt = signal(cx, || None::<Result<Receipt, String>>);
 
-    // Reading the receipt on the server makes the page run again when the
-    // browser stores a new one, so plain Rust renders it below.
+    // This server read subscribes the page to receipt changes. A new receipt
+    // from the browser triggers another render of the Rust match below.
     let placed = receipt.get();
 
     Ok(view! {
-        // Each handler builds a new order from the current one and stores it.
+        // Update a field by replacing the signal's order with a new record.
         <label>
             "item "
             <input
                 :value=$(order.read().item.to_owned())
                 @input=$(|e: Event| {
-                    let order_ = order.get();
+                    let current = order.get();
                     order.set(Order {
                         item: e.target.value,
-                        quantity: order_.quantity,
-                        address: order_.address,
+                        quantity: current.quantity,
+                        address: current.address,
                     });
                 })
             >
@@ -70,12 +70,12 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
             "quantity: " $(order.get().quantity) " "
             <button
                 @click=$(|_e| {
-                    let order_ = order.get();
-                    if order_.quantity > 1u32 {
+                    let current = order.get();
+                    if current.quantity > 1u32 {
                         order.set(Order {
-                            quantity: order_.quantity - 1u32,
-                            item: order_.item,
-                            address: order_.address,
+                            quantity: current.quantity - 1u32,
+                            item: current.item,
+                            address: current.address,
                         });
                     }
                 })
@@ -84,11 +84,11 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
             </button>
             <button
                 @click=$(|_e| {
-                    let order_ = order.get();
+                    let current = order.get();
                     order.set(Order {
-                        quantity: order_.quantity + 1u32,
-                        item: order_.item,
-                        address: order_.address,
+                        quantity: current.quantity + 1u32,
+                        item: current.item,
+                        address: current.address,
                     });
                 })
             >
@@ -101,11 +101,11 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
             <input
                 :value=$(order.read().address.street.to_owned())
                 @input=$(|e: Event| {
-                    let order_ = order.get();
+                    let current = order.get();
                     order.set(Order {
-                        address: Address { street: e.target.value, city: order_.address.city },
-                        item: order_.item,
-                        quantity: order_.quantity,
+                        address: Address { street: e.target.value, city: current.address.city },
+                        item: current.item,
+                        quantity: current.quantity,
                     });
                 })
             >
@@ -116,17 +116,17 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
             <input
                 :value=$(order.read().address.city.to_owned())
                 @input=$(|e: Event| {
-                    let order_ = order.get();
+                    let current = order.get();
                     order.set(Order {
-                        address: Address { street: order_.address.street, city: e.target.value },
-                        item: order_.item,
-                        quantity: order_.quantity,
+                        address: Address { street: current.address.street, city: e.target.value },
+                        item: current.item,
+                        quantity: current.quantity,
                     });
                 })
             >
         </label>
 
-        // Sends the whole order to the server and stores the answer.
+        // Submit the complete order and save the procedure's result.
         <p>
             <button
                 @click=$(async |_e| {
@@ -150,8 +150,8 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
 
 static NEXT_ORDER: AtomicU64 = AtomicU64::new(1);
 
-// The order comes from the browser, so the procedure validates it like any
-// other client input. The nested `Result` lets the page show the problem.
+// Validate the browser's order before accepting it. Return validation errors
+// in the inner `Result` so the page can display them.
 #[procedure]
 pub async fn place_order(order: Order) -> Result<Result<Receipt, String>> {
     if !(1..=10).contains(&order.quantity) {

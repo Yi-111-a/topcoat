@@ -1,4 +1,4 @@
-The `#[record]` attribute makes a struct usable in runtime [expressions](macro.expr.html). Records group values under field names, like tuples group them by position. Expressions can build records, read their fields, and pass them to signals and procedures.
+Use `#[record]` to work with your own structs in runtime [expressions](macro.expr.html). An expression can create a record, access its fields by name, store it in a signal, or pass it to a procedure.
 
 ```rust
 use topcoat::runtime::record;
@@ -11,11 +11,11 @@ struct Todo {
 }
 ```
 
-Every field type must belong to the shared vocabulary of [`expr!`](macro.expr.html). Fields can also be other records, and records can appear inside other supported types, such as `Vec<Todo>` or `Option<Todo>`.
+Declare a struct with named fields and add the attribute above it. Each field must use a type supported by [`expr!`](macro.expr.html), which includes other records. Supported containers can hold records too, for example `Vec<Todo>` and `Option<Todo>`.
 
-# Using Records In Expressions
+# Reading and updating a record
 
-An expression builds a record with Rust's struct literal syntax and reads a field with `.`:
+Use a struct literal to create a record and dot syntax to access a field. This example stores a todo in a signal, displays its title, and replaces it with a completed todo when the button is clicked:
 
 ```rust
 # use topcoat::{Result, context::Cx, runtime::{record, signal}, view::*};
@@ -43,21 +43,21 @@ Ok(view! {
 # }
 ```
 
-Field values follow the expression rules for their types. For example, an unsuffixed integer literal is a `usize`, so a `u32` field needs a value such as `1u32`. Struct update syntax (`..base`) is not supported.
+Provide every field when constructing a record. Expressions do not support struct update syntax (`..base`). The usual expression type rules apply to field values. An integer literal without a suffix has type `usize`, so use a suffix such as `1u32` when a field expects `u32`.
 
-Reading a field of a borrowed record borrows the field, as with tuples. `clone` copies a borrowed record into an owned one if the struct implements `Clone`. [`Signal::get`] also requires `Clone`; [`Signal::read`] does not.
+Accessing a field through a borrowed record gives you a borrow of that field. To obtain an owned record from a borrow, call `clone` on a record that implements `Clone`. For a signal containing a record, [`Signal::read`] borrows the value without requiring `Clone`, while [`Signal::get`] clones it.
 
-A record does not render on its own. Render its fields instead.
+Render the individual fields you want to display. Records cannot be rendered directly or compared in expressions.
 
-# Declaring Records
+# Declaration limits
 
-A record must be a struct with named fields and no generic parameters. Field visibility applies inside expressions as it does in Rust. Some field names are reserved because they would collide with names the browser runtime uses, such as `clone`, `then`, and `constructor`. The macro reports an error for a reserved name.
+Records cannot have generic parameters. Expressions respect Rust's field visibility rules, so a private field is accessible only where Rust permits it. The macro also rejects field names reserved by the browser runtime, including `clone`, `then`, and `constructor`.
 
-# Security
+# Data sent to and from the browser
 
-A captured record sends every field to the browser, including private fields. Do not store secrets in records that reach an expression.
+Capturing a record in an expression exposes all of its fields to the browser. Private fields are included, so keep secrets out of any record you capture.
 
-Records that come back from the browser, such as procedure arguments or restored signal values, are rebuilt from client input. The browser can send any field values, even values that Rust code outside the module could not construct. Validate records from the browser like any other client input.
+Treat records received from the browser as client input. This includes procedure arguments and restored signal values. Rust's visibility rules do not restrict the values a client can submit for private fields. Validate incoming records before using them.
 
 [`Signal::get`]: struct.Signal.html#method.get
 [`Signal::read`]: struct.Signal.html#method.read
