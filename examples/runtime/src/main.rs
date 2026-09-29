@@ -1,4 +1,7 @@
 mod counter;
+mod procedure;
+mod record;
+mod shard;
 mod show;
 mod sort;
 
@@ -37,8 +40,8 @@ async fn layout(slot: Slot<'_>) -> Result<impl View> {
             <head>
                 topcoat::dev::script()
 
-                // Signals, event handlers, and page re-runs need the
-                // browser runtime.
+                // Signals, event handlers, page re-runs, procedures, and
+                // shards need the browser runtime.
                 topcoat::runtime::script()
             </head>
             <body>
@@ -50,6 +53,12 @@ async fn layout(slot: Slot<'_>) -> Result<impl View> {
                     link(href: href!(show::page), "show")
                     " | "
                     link(href: href!(sort::page), "sort")
+                    " | "
+                    link(href: href!(procedure::page), "procedure")
+                    " | "
+                    link(href: href!(shard::page), "shard")
+                    " | "
+                    link(href: href!(record::page), "record")
                 </nav>
 
                 <hr>

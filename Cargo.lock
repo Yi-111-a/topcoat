@@ -2120,14 +2120,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "procedure"
-version = "0.9.0"
-dependencies = [
- "tokio",
- "topcoat",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2585,14 +2577,6 @@ dependencies = [
  "cfg-if",
  "cpufeatures 0.3.0",
  "digest 0.11.3",
-]
-
-[[package]]
-name = "shard"
-version = "0.9.0"
-dependencies = [
- "tokio",
- "topcoat",
 ]
 
 [[package]]

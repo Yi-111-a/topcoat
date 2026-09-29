@@ -2,41 +2,15 @@ use std::time::Duration;
 
 use topcoat::{
     Result,
-    asset::{AssetBundle, RouterBuilderAssetExt},
     context::Cx,
-    router::{RouterBuilderDiscoverExt, module_router, page},
-    runtime::{Event, RouterBuilderRuntimeExt, shard, signal},
+    router::page,
+    runtime::{Event, shard, signal},
     view::{View, component, view},
 };
 
-#[tokio::main]
-async fn main() {
-    topcoat::start(
-        module_router!()
-            .assets(AssetBundle::load().unwrap())
-            .discover()
-            .runtime()
-            .build(),
-    )
-    .await
-    .unwrap();
-}
-
 #[page]
-async fn home() -> Result<impl View> {
-    Ok(view! {
-        <!DOCTYPE html>
-        <html>
-            <head>
-                topcoat::dev::script()
-
-                // Signals and shards need the browser runtime.
-                topcoat::runtime::script()
-            </head>
-
-            <body>search()</body>
-        </html>
-    })
+pub async fn page() -> Result<impl View> {
+    Ok(view! { search() })
 }
 
 #[component]
@@ -85,10 +59,8 @@ async fn search_results(cx: &Cx, query: String) -> Result<impl View> {
     })
 }
 
-// Simulate a server-side lookup that takes half a second.
+// Simulate a server-side database lookup.
 async fn search_fruit(_cx: &Cx, query: &str) -> Vec<&'static str> {
-    tokio::time::sleep(Duration::from_secs_f32(0.5)).await;
-
     let needle = query.to_lowercase();
 
     FRUIT
