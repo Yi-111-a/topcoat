@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use topcoat::{
     Result,
     context::Cx,
@@ -37,7 +39,7 @@ async fn search_results(cx: &Cx, query: String) -> Result<impl View> {
     // Reading the limit on the server makes the shard depend on it. When the
     // button below changes it in the browser, only the shard renders again,
     // not the page around it.
-    let results = search_fruit(cx, &query);
+    let results = search_fruit(cx, &query).await;
     // The limit comes from the client, so a real application would validate
     // it. Clamping it keeps a bogus value from becoming a huge count.
     let shown = limit.get().min(100);
@@ -58,7 +60,9 @@ async fn search_results(cx: &Cx, query: String) -> Result<impl View> {
 }
 
 // Search a fixed list in place of a database.
-fn search_fruit(_cx: &Cx, query: &str) -> Vec<&'static str> {
+async fn search_fruit(_cx: &Cx, query: &str) -> Vec<&'static str> {
+    tokio::time::sleep(Duration::from_millis(100)).await;
+
     let needle = query.to_lowercase();
 
     FRUIT
