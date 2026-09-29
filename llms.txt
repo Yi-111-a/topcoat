@@ -86,6 +86,16 @@ Ok(view! {
 - [Sessions](docs/session.md): `.cookies().sessions(SessionConfig::default())`. Authenticate, then `session::start(cx).await?`; store token_hash/user/expiry, never raw token. `token_hash(cx).await?` needs application lookup+expiry validation. `stop` returns hash to delete; `refresh` requires validation+persisted expiry; `rotate` requires revoking old hash+persisting replacement. Default cookie: __Host-/Secure/HttpOnly/SameSite=Lax/Path=/. Mutate before streaming. TokenStore changes transport, not database storage.
 - [Mail](docs/mail.md), `mail`/`mail-smtp`: `.mail(MailConfig::builder().transport(...).build())`; `mail! { from: "...", to: "...", html: { cx => ... } }?`, then `send(cx, mail).await?`. Plain text derived from HTML; attachments supported. FileTransport for .eml, MemoryTransport for tests, SmtpTransport for delivery.
 
+## Deployment
+
+- No `topcoat serve`: the app binary serves itself. `cargo build --release` + `topcoat asset bundle --release` (bundler defaults to `dev`, so a bare `topcoat asset bundle` misses the release binary); both must use the same profile/package.
+- Ship the executable with the `assets/` directory beside it; `AssetBundle::load` only looks next to the binary, `--out` needs `load_dir`. Asset IDs hash crate name, source file and path; generated assets include `OUT_DIR`, so a bundle built in another directory does not match the binary. Build both in one job/checkout.
+- Bind address comes from `HOST`/`PORT`, default `127.0.0.1:3000`. `Topcoat.toml` is an editor marker only and configures nothing.
+- No TLS termination; front with a reverse proxy. `serve` takes any listener, including `UnixListener`. No HSTS header is sent. `client_ip` ignores forwarding headers unless `trusted_proxies` is configured.
+- Persist the cookie `Key` (≥64 bytes, `Key::try_from`) across restarts and replicas, or every session is invalidated on boot. Session storage must outlive the process too.
+- `#[shard]` without a path gets a random one per build; pass an absolute path so open tabs survive a restart.
+- `serve` drains on `SIGINT`, and `SIGTERM` on Unix, until `RouterService::shutdown_timeout`; point supervisors at `SIGTERM`. [Deployment](docs/deployment.md).
+
 ## Optional HTTP integrations
 
 - `fs`: import `RouterBuilderDirectoryExt`; `.public_dir("./public")` or `.serve_dir("/files/{*rest}", dir)` for fixed file URLs.

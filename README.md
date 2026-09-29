@@ -206,6 +206,7 @@ view! { <link rel="stylesheet" href=(topcoat::tailwind::stylesheet!())> }
 
 **Start here**
 - [Getting started](https://github.com/tokio-rs/topcoat/blob/main/docs/getting_started.md): create a new project, install the CLI, run the dev server.
+- [Deployment](https://github.com/tokio-rs/topcoat/blob/main/docs/deployment.md): build the binary, bundle its assets, and put a reverse proxy in front of it.
 - [Source code formatting](https://github.com/tokio-rs/topcoat/blob/main/docs/cli/fmt.md): `topcoat fmt` for macro bodies.
 
 **Rendering**
@@ -263,7 +264,7 @@ Planned features we'd like to bring to Topcoat. Have an idea? [Open an issue](ht
 - [ ] Validations
 - [ ] Localization support
 - [ ] `OpenAPI` endpoints
-- [ ] Docs for how to deploy Topcoat
+- [x] Docs for how to deploy Topcoat
 - [ ] Pre-rendering for static pages
 - [ ] `WebTransport`
 - [ ] Image optimization / resizing
