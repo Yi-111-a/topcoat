@@ -2,7 +2,7 @@ use std::fmt::Write;
 
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
-use syn::{ExprField, Member};
+use syn::{ExprField, Member, ext::IdentExt};
 
 use super::js::Js;
 use crate::expr::{Expr, name_resolver::NameResolver};
@@ -18,7 +18,7 @@ impl Expr {
         Self::dispatch(&field.base, &mut base, js, names)?;
 
         match &field.member {
-            Member::Named(name) => write!(js, ".{name}").unwrap(),
+            Member::Named(name) => write!(js, ".{}", name.unraw()).unwrap(),
             Member::Unnamed(index) => write!(js, "[{}]", index.index).unwrap(),
         }
 

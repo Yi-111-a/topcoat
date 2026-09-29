@@ -1,6 +1,6 @@
 import type { AttributeValueViewParts, NodeViewParts } from "../dom/view";
 import { Bool } from "./bool";
-import { F64 } from "./f64";
+import { Integer, serverUsizeType } from "./integer";
 
 const TEXT_ENCODER = new TextEncoder();
 
@@ -64,8 +64,11 @@ export class Str implements AttributeValueViewParts, NodeViewParts {
 		return new Bool(this.v.length === 0);
 	}
 
-	len(): F64 {
-		return new F64(TEXT_ENCODER.encode(this.v).length);
+	len(): Integer {
+		return new Integer(
+			BigInt(TEXT_ENCODER.encode(this.v).length),
+			serverUsizeType(),
+		);
 	}
 
 	trim(): Str {

@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 /// A value compared independently of runtime serialization and rendering.
@@ -19,6 +21,7 @@ pub enum Value {
     Err(Box<Value>),
     Tuple(Vec<Value>),
     Sequence(Vec<Value>),
+    Record(BTreeMap<String, Value>),
 }
 
 /// An expression's value, language panic, or JavaScript error.

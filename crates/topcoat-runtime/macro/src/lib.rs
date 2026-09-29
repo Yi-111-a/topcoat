@@ -19,6 +19,15 @@ pub fn procedure(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
+#[doc = include_str!("../docs/record.md")]
+#[proc_macro_attribute]
+pub fn record(attr: TokenStream, item: TokenStream) -> TokenStream {
+    match topcoat_runtime_grammar::record::Record::parse(attr.into(), item.into()) {
+        Ok(value) => quote! { #value }.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
 #[doc = include_str!("../docs/shard.md")]
 #[proc_macro_attribute]
 pub fn shard(attr: TokenStream, item: TokenStream) -> TokenStream {

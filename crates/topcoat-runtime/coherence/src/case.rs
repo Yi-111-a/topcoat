@@ -153,8 +153,9 @@ impl Case {
             format!("TopcoatCoherence.execute({source}, {})", self.invoke)
         };
         let script = format!(
-            "{}\n{call};",
-            include_str!("../../browser/dist/coherence.js")
+            "{}\nTopcoatCoherence.setServerUsizeBits({});\n{call};",
+            include_str!("../../browser/dist/coherence.js"),
+            usize::BITS,
         );
         let json = ENGINE.with(|engine| {
             let mut engine = engine.borrow_mut();

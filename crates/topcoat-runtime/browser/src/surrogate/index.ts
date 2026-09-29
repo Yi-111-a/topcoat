@@ -5,6 +5,7 @@ export * from "./integer";
 export * from "./option";
 export * from "./panic";
 export * from "./procedure";
+export * from "./record";
 export * from "./ref";
 export * from "./result";
 export * from "./sequence";

@@ -17,6 +17,7 @@ mod expr_method_call;
 mod expr_paren;
 mod expr_path;
 mod expr_return;
+mod expr_struct;
 mod expr_unary;
 mod expr_while;
 mod js;
@@ -135,6 +136,7 @@ impl Expr {
             syn::Expr::MethodCall(inner) => Self::expr_method_call(inner, rust, js, names)?,
             syn::Expr::Call(inner) => Self::expr_call(inner, rust, js, names)?,
             syn::Expr::Field(inner) => Self::expr_field(inner, rust, js, names)?,
+            syn::Expr::Struct(inner) => Self::expr_struct(inner, rust, js, names)?,
             syn::Expr::Index(inner) => Self::expr_index(inner, rust, js, names)?,
             syn::Expr::Block(inner) => Self::expr_block(inner, rust, js, names)?,
             syn::Expr::Closure(inner) => Self::expr_closure(inner, rust, js, names)?,

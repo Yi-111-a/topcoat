@@ -38,9 +38,9 @@ impl Expr {
         if ident == "None" {
             js.push_str("cx.none()");
             let ctor = match arguments {
-                PathArguments::None => quote! { #topcoat_runtime::Option::<_>::none },
+                PathArguments::None => quote! { #topcoat_runtime::OptionSurrogate::<_>::none },
                 PathArguments::AngleBracketed(arguments) => {
-                    quote! { #topcoat_runtime::Option #arguments ::none }
+                    quote! { #topcoat_runtime::OptionSurrogate #arguments ::none }
                 }
                 PathArguments::Parenthesized(_) => unreachable!("rejected above"),
             };

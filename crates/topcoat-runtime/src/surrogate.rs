@@ -28,6 +28,10 @@ pub use string::*;
 pub use tuple::*;
 pub use vec::*;
 
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` cannot be used in runtime expressions",
+    note = "declare a struct with `#[record]` to use it in runtime expressions"
+)]
 pub trait Surrogated {
     type Surrogate: Surrogate<Real = Self>;
 

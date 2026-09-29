@@ -5,6 +5,8 @@ mod bind_attribute;
 mod connection;
 mod event_handler;
 mod expr;
+#[doc(hidden)]
+pub mod internal;
 mod js;
 #[cfg(feature = "router")]
 mod layer;

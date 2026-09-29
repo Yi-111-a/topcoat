@@ -1,5 +1,5 @@
 import type { SignalId, SignalRegistry } from "../signal-registry";
-import { Option, Result, WriteSignal } from "../surrogate";
+import { Option, Record, Result, WriteSignal } from "../surrogate";
 import { hydrate } from "./hydrate";
 import type { DehydratedSurrogate } from "./serialized";
 
@@ -33,5 +33,9 @@ export class Context {
 
 	err<T = never, E = unknown>(v: E): Result<T, E> {
 		return Result.from_err(v);
+	}
+
+	record(fields: { [field: string]: unknown }): Record {
+		return new Record(Object.entries(fields));
 	}
 }

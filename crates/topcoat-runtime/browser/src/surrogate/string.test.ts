@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 
+import { Integer, integerType, setServerUsizeBits } from "./integer";
 import { String as RuntimeString, Str } from "./string";
 
 // Regression for #192: `String.deref()` returned `this`, so any loop that
@@ -40,9 +41,18 @@ it("ref-unwrapping an owned string terminates", () => {
 
 // Regression for #126: `len()` counted UTF-16 code units.
 it("counts length in UTF-8 bytes", () => {
+	setServerUsizeBits(64);
 	expect(new Str("한😊").len().toString()).toBe("7");
 	expect(new Str("a").len().toString()).toBe("1");
 	expect(new Str("é").len().toString()).toBe("2");
+});
+
+it("measures length as the server's usize", () => {
+	setServerUsizeBits(32);
+	const length = new Str("abc").len();
+	const index = new Integer(3n, integerType("usize", 32));
+	expect(length.eq(index).toString()).toBe("true");
+	expect(() => length.eq(new Integer(3n, integerType("usize", 64)))).toThrow();
 });
 
 // Regression for #236: `<` and friends order by UTF-16 code unit, which puts

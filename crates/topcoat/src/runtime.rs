@@ -17,6 +17,10 @@ pub async fn script(cx: &topcoat::context::Cx) -> topcoat::Result<impl topcoat::
         "the browser runtime is not set up on this router; call `.runtime()` on the router builder",
     );
     Ok(topcoat::view::view! {
-        <script type="module" src=(topcoat::runtime::SCRIPT)></script>
+        <script
+            type="module"
+            src=(topcoat::runtime::SCRIPT)
+            data-topcoat-usize-bits=(usize::BITS)
+        ></script>
     })
 }

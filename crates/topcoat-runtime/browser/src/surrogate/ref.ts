@@ -1,3 +1,4 @@
+import { Record } from "./record";
 import { Tuple } from "./tuple";
 
 export class Ref<T> {
@@ -22,6 +23,14 @@ export class Ref<T> {
 					if (String(index) === property && pointee.isIndex(index)) {
 						return Ref.shared(() => (reference.read() as Tuple)[index]);
 					}
+				}
+				// Field access on a borrowed record borrows the field.
+				if (
+					pointee instanceof Record &&
+					typeof property === "string" &&
+					Object.hasOwn(pointee, property)
+				) {
+					return Ref.shared(() => (reference.read() as Record)[property]);
 				}
 				if (property === "clone" && pointee instanceof Ref) {
 					return () => pointee;

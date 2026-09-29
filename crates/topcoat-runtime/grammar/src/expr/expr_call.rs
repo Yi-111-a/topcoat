@@ -22,27 +22,46 @@ impl Expr {
         {
             let segment = path.path.segments.first().unwrap();
             let path_arguments = &segment.arguments;
-            match segment.ident.to_string().as_str() {
-                "Some" => {
-                    quote! { #topcoat_runtime::Option #path_arguments ::some }.to_tokens(rust);
-                    *js += "cx.some";
-                    return Self::args(args, rust, js, names);
-                }
-                "Ok" => {
-                    quote! { #topcoat_runtime::Result #path_arguments ::from_ok }.to_tokens(rust);
-                    *js += "cx.ok";
-                    return Self::args(args, rust, js, names);
-                }
-                "Err" => {
-                    quote! { #topcoat_runtime::Result #path_arguments ::from_err }.to_tokens(rust);
-                    *js += "cx.err";
-                    return Self::args(args, rust, js, names);
-                }
-                _ => {
-                    // fall through to .call(...)
-                }
+            let (constructor, js_constructor) = match segment.ident.to_string().as_str() {
+                "Some" => (
+                    quote! { #topcoat_runtime::OptionSurrogate #path_arguments ::some },
+                    "cx.some(",
+                ),
+                "Ok" => (
+                    quote! { #topcoat_runtime::ResultSurrogate #path_arguments ::from_ok },
+                    "cx.ok(",
+                ),
+                "Err" => (
+                    quote! { #topcoat_runtime::ResultSurrogate #path_arguments ::from_err },
+                    "cx.err(",
+                ),
+                _ => return Self::call(call, rust, js, names),
+            };
+            if args.len() != 1 {
+                return Err(syn::Error::new_spanned(
+                    args,
+                    format!("`{}` takes exactly one argument", segment.ident),
+                ));
             }
+            let value = &args[0];
+            *js += js_constructor;
+            let mut tokens = TokenStream::new();
+            Self::dispatch(value, &mut tokens, js, names)?;
+            *js += ")";
+            quote! { #constructor(#tokens) }.to_tokens(rust);
+            return Ok(());
         }
+
+        Self::call(call, rust, js, names)
+    }
+
+    fn call(
+        call: &ExprCall,
+        rust: &mut TokenStream,
+        js: &mut Js,
+        names: &mut NameResolver,
+    ) -> syn::Result<()> {
+        let args = &call.args;
 
         // `.call(...)` syntax
         Self::dispatch(&call.func, rust, js, names)?;

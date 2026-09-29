@@ -32,6 +32,19 @@ fn captured_options() {
 }
 
 #[test]
+fn constructed_variants() {
+    let text = String::from("hello");
+    coherent!(Some(1.5));
+    coherent!(Some(Some(text.clone())));
+    coherent!(Some(text.len()).unwrap());
+    coherent!(None::<f64>);
+    coherent!(None::<f64>.is_none());
+    coherent!(Ok::<f64, String>(2.0));
+    coherent!(Err::<f64, String>(text.clone()));
+    coherent!(Err::<f64, String>(text.clone()).unwrap_err().len());
+}
+
+#[test]
 fn captured_results() {
     for value in [Ok(0.0), Ok(-0.0), Err(String::from("failed"))] {
         coherent!(value);
