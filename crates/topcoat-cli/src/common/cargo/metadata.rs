@@ -136,14 +136,14 @@ mod tests {
 
     use super::*;
 
-    fn metadata(packages: serde_json::Value) -> Metadata {
+    fn metadata(packages: &serde_json::Value) -> Metadata {
         Metadata(json!({ "packages": packages }))
     }
 
     fn package(
         name: &str,
         default_run: Option<&str>,
-        targets: serde_json::Value,
+        targets: &serde_json::Value,
     ) -> serde_json::Value {
         json!({
             "name": name,
@@ -167,10 +167,10 @@ mod tests {
     /// An application with the usual `src/main.rs` plus an extra `src/bin/cli.rs`,
     /// which is what following the Toasty migration guide produces.
     fn two_bin_app(default_run: Option<&str>) -> Metadata {
-        metadata(json!([package(
+        metadata(&json!([package(
             "app",
             default_run,
-            json!([
+            &json!([
                 bin("app", "/w/app/src/main.rs"),
                 bin("cli", "/w/app/src/bin/cli.rs"),
             ]),
@@ -211,20 +211,20 @@ mod tests {
 
     #[test]
     fn lib_targets_are_never_default_run_candidates() {
-        let metadata = metadata(json!([package(
+        let metadata = metadata(&json!([package(
             "app",
             Some("app"),
-            json!([target("app", &["lib"], "/w/app/src/lib.rs")]),
+            &json!([target("app", &["lib"], "/w/app/src/lib.rs")]),
         )]));
         assert_eq!(metadata.default_run("app"), None);
     }
 
     #[test]
     fn a_lib_target_sharing_a_name_does_not_shadow_the_bin() {
-        let metadata = metadata(json!([package(
+        let metadata = metadata(&json!([package(
             "app",
             Some("app"),
-            json!([
+            &json!([
                 target("app", &["lib"], "/w/app/src/lib.rs"),
                 bin("app", "/w/app/src/main.rs"),
             ]),
@@ -249,9 +249,7 @@ mod tests {
             ],
         }));
         assert_eq!(
-            metadata
-                .package_containing_dir(Path::new("/w/examples/app/src"))
-                .as_deref(),
+            metadata.package_containing_dir(Path::new("/w/examples/app/src")),
             Some("app")
         );
         assert_eq!(metadata.default_run("app").as_deref(), Some("cli"));
@@ -280,9 +278,7 @@ mod tests {
             ],
         }));
         assert_eq!(
-            metadata
-                .package_containing_dir(Path::new("/w/app/src"))
-                .as_deref(),
+            metadata.package_containing_dir(Path::new("/w/app/src")),
             None
         );
     }
