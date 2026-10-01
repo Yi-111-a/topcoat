@@ -205,7 +205,7 @@ impl fmt::Display for BuildError {
             Self::Multiple(paths) => {
                 write!(
                     f,
-                    "cargo produced multiple targets; pass --bin or --package to choose one:"
+                    "cargo produced multiple targets; pass --bin or --package to choose one, or set `[package] default-run` in Cargo.toml:"
                 )?;
                 for p in paths {
                     write!(f, "\n  {}", p.display())?;
